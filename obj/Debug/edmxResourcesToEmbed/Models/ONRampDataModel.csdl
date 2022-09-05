@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="OnRampDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="OnRampDBEntities" annotation:LazyLoadingEnabled="true">
+    <FunctionImport Name="sp_alterdiagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="version" Mode="In" Type="Int32" />
+      <Parameter Name="definition" Mode="In" Type="Binary" />
+    </FunctionImport>
+    <FunctionImport Name="sp_creatediagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="version" Mode="In" Type="Int32" />
+      <Parameter Name="definition" Mode="In" Type="Binary" />
+    </FunctionImport>
+    <FunctionImport Name="sp_dropdiagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_helpdiagramdefinition" ReturnType="Collection(OnRampDBModel.sp_helpdiagramdefinition_Result)">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_helpdiagrams" ReturnType="Collection(OnRampDBModel.sp_helpdiagrams_Result)">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_renamediagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="new_diagramname" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="sp_upgraddiagrams" />
+    <EntitySet Name="sysdiagrams" EntityType="OnRampDBModel.sysdiagram" />
+    <EntitySet Name="tblCustomers" EntityType="OnRampDBModel.tblCustomer" />
+    <EntitySet Name="tblLogins" EntityType="OnRampDBModel.tblLogin" />
+    <EntitySet Name="tblLoginTypes" EntityType="OnRampDBModel.tblLoginType" />
+    <EntitySet Name="tblOrders" EntityType="OnRampDBModel.tblOrder" />
+    <EntitySet Name="tblPaymentStatus" EntityType="OnRampDBModel.tblPaymentStatu" />
+    <EntitySet Name="tblProducts" EntityType="OnRampDBModel.tblProduct" />
+    <EntitySet Name="tblProductCategories" EntityType="OnRampDBModel.tblProductCategory" />
+    <EntitySet Name="tblProductStatus" EntityType="OnRampDBModel.tblProductStatu" />
+    <EntitySet Name="tblSuppliers" EntityType="OnRampDBModel.tblSupplier" />
+    <AssociationSet Name="FK_tblCustomer_tblLogin" Association="OnRampDBModel.FK_tblCustomer_tblLogin">
+      <End Role="tblLogin" EntitySet="tblLogins" />
+      <End Role="tblCustomer" EntitySet="tblCustomers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblOrder_tblCustomer" Association="OnRampDBModel.FK_tblOrder_tblCustomer">
+      <End Role="tblCustomer" EntitySet="tblCustomers" />
+      <End Role="tblOrder" EntitySet="tblOrders" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Login_LoginType" Association="OnRampDBModel.FK_Login_LoginType">
+      <End Role="tblLoginType" EntitySet="tblLoginTypes" />
+      <End Role="tblLogin" EntitySet="tblLogins" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblOrder_tblPaymentStatus" Association="OnRampDBModel.FK_tblOrder_tblPaymentStatus">
+      <End Role="tblPaymentStatu" EntitySet="tblPaymentStatus" />
+      <End Role="tblOrder" EntitySet="tblOrders" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblOrder_tblProduct" Association="OnRampDBModel.FK_tblOrder_tblProduct">
+      <End Role="tblProduct" EntitySet="tblProducts" />
+      <End Role="tblOrder" EntitySet="tblOrders" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblProduct_tblProductCategory" Association="OnRampDBModel.FK_tblProduct_tblProductCategory">
+      <End Role="tblProductCategory" EntitySet="tblProductCategories" />
+      <End Role="tblProduct" EntitySet="tblProducts" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblProduct_tblProductStatus" Association="OnRampDBModel.FK_tblProduct_tblProductStatus">
+      <End Role="tblProductStatu" EntitySet="tblProductStatus" />
+      <End Role="tblProduct" EntitySet="tblProducts" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblProduct_tblSupplier" Association="OnRampDBModel.FK_tblProduct_tblSupplier">
+      <End Role="tblSupplier" EntitySet="tblSuppliers" />
+      <End Role="tblProduct" EntitySet="tblProducts" />
+    </AssociationSet>
+  </EntityContainer>
+  <ComplexType Name="sp_helpdiagramdefinition_Result">
+    <Property Type="Int32" Name="version" Nullable="true" />
+    <Property Type="Binary" Name="definition" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_helpdiagrams_Result">
+    <Property Type="String" Name="Database" Nullable="true" MaxLength="128" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="128" />
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
+    <Property Type="Int32" Name="OwnerID" Nullable="false" />
+  </ComplexType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="tblCustomer">
+    <Key>
+      <PropertyRef Name="CustomerID" />
+    </Key>
+    <Property Name="CustomerID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Tel" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="Address" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="LoginID" Type="Int32" />
+    <NavigationProperty Name="tblLogin" Relationship="OnRampDBModel.FK_tblCustomer_tblLogin" FromRole="tblCustomer" ToRole="tblLogin" />
+    <NavigationProperty Name="tblOrders" Relationship="OnRampDBModel.FK_tblOrder_tblCustomer" FromRole="tblCustomer" ToRole="tblOrder" />
+  </EntityType>
+  <EntityType Name="tblLogin">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Username" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="Password" Type="String" MaxLength="60" FixedLength="true" Unicode="false" />
+    <Property Name="DateRegistered" Type="DateTime" Precision="3" />
+    <Property Name="roleID" Type="Int32" />
+    <NavigationProperty Name="tblCustomers" Relationship="OnRampDBModel.FK_tblCustomer_tblLogin" FromRole="tblLogin" ToRole="tblCustomer" />
+    <NavigationProperty Name="tblLoginType" Relationship="OnRampDBModel.FK_Login_LoginType" FromRole="tblLogin" ToRole="tblLoginType" />
+  </EntityType>
+  <EntityType Name="tblLoginType">
+    <Key>
+      <PropertyRef Name="roleID" />
+    </Key>
+    <Property Name="roleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="tblLogins" Relationship="OnRampDBModel.FK_Login_LoginType" FromRole="tblLoginType" ToRole="tblLogin" />
+  </EntityType>
+  <EntityType Name="tblOrder">
+    <Key>
+      <PropertyRef Name="OrderID" />
+    </Key>
+    <Property Name="OrderID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CustomerID" Type="Int32" />
+    <Property Name="Barcode" Type="String" MaxLength="13" FixedLength="true" Unicode="false" />
+    <Property Name="ProductName" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="SupplierID" Type="Int32" />
+    <Property Name="DateCaptured" Type="DateTime" Precision="3" />
+    <Property Name="DateSold" Type="DateTime" Precision="3" />
+    <Property Name="PaymentStatusID" Type="Int32" />
+    <NavigationProperty Name="tblCustomer" Relationship="OnRampDBModel.FK_tblOrder_tblCustomer" FromRole="tblOrder" ToRole="tblCustomer" />
+    <NavigationProperty Name="tblPaymentStatu" Relationship="OnRampDBModel.FK_tblOrder_tblPaymentStatus" FromRole="tblOrder" ToRole="tblPaymentStatu" />
+    <NavigationProperty Name="tblProduct" Relationship="OnRampDBModel.FK_tblOrder_tblProduct" FromRole="tblOrder" ToRole="tblProduct" />
+  </EntityType>
+  <EntityType Name="tblPaymentStatu">
+    <Key>
+      <PropertyRef Name="PaymentStatusID" />
+    </Key>
+    <Property Name="PaymentStatusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="tblOrders" Relationship="OnRampDBModel.FK_tblOrder_tblPaymentStatus" FromRole="tblPaymentStatu" ToRole="tblOrder" />
+  </EntityType>
+  <EntityType Name="tblProduct">
+    <Key>
+      <PropertyRef Name="Barcode" />
+    </Key>
+    <Property Name="Barcode" Type="String" Nullable="false" MaxLength="13" FixedLength="true" Unicode="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DateCaptured" Type="DateTime" Precision="3" />
+    <Property Name="Location" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Warranty" Type="Boolean" />
+    <Property Name="ProductStatusID" Type="Int32" />
+    <Property Name="SupplierID" Type="Int32" />
+    <Property Name="ProductCategoryID" Type="Int32" />
+    <NavigationProperty Name="tblOrders" Relationship="OnRampDBModel.FK_tblOrder_tblProduct" FromRole="tblProduct" ToRole="tblOrder" />
+    <NavigationProperty Name="tblProductCategory" Relationship="OnRampDBModel.FK_tblProduct_tblProductCategory" FromRole="tblProduct" ToRole="tblProductCategory" />
+    <NavigationProperty Name="tblProductStatu" Relationship="OnRampDBModel.FK_tblProduct_tblProductStatus" FromRole="tblProduct" ToRole="tblProductStatu" />
+    <NavigationProperty Name="tblSupplier" Relationship="OnRampDBModel.FK_tblProduct_tblSupplier" FromRole="tblProduct" ToRole="tblSupplier" />
+  </EntityType>
+  <EntityType Name="tblProductCategory">
+    <Key>
+      <PropertyRef Name="CategoryID" />
+    </Key>
+    <Property Name="CategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="tblProducts" Relationship="OnRampDBModel.FK_tblProduct_tblProductCategory" FromRole="tblProductCategory" ToRole="tblProduct" />
+  </EntityType>
+  <EntityType Name="tblProductStatu">
+    <Key>
+      <PropertyRef Name="ProductStatusID" />
+    </Key>
+    <Property Name="ProductStatusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="tblProducts" Relationship="OnRampDBModel.FK_tblProduct_tblProductStatus" FromRole="tblProductStatu" ToRole="tblProduct" />
+  </EntityType>
+  <EntityType Name="tblSupplier">
+    <Key>
+      <PropertyRef Name="SupplierID" />
+    </Key>
+    <Property Name="SupplierID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Tel" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+    <Property Name="Address" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="tblProducts" Relationship="OnRampDBModel.FK_tblProduct_tblSupplier" FromRole="tblSupplier" ToRole="tblProduct" />
+  </EntityType>
+  <Association Name="FK_tblCustomer_tblLogin">
+    <End Type="OnRampDBModel.tblLogin" Role="tblLogin" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblCustomer" Role="tblCustomer" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblLogin">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="tblCustomer">
+        <PropertyRef Name="LoginID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblOrder_tblCustomer">
+    <End Type="OnRampDBModel.tblCustomer" Role="tblCustomer" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblOrder" Role="tblOrder" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblCustomer">
+        <PropertyRef Name="CustomerID" />
+      </Principal>
+      <Dependent Role="tblOrder">
+        <PropertyRef Name="CustomerID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Login_LoginType">
+    <End Type="OnRampDBModel.tblLoginType" Role="tblLoginType" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblLogin" Role="tblLogin" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblLoginType">
+        <PropertyRef Name="roleID" />
+      </Principal>
+      <Dependent Role="tblLogin">
+        <PropertyRef Name="roleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblOrder_tblPaymentStatus">
+    <End Type="OnRampDBModel.tblPaymentStatu" Role="tblPaymentStatu" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblOrder" Role="tblOrder" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblPaymentStatu">
+        <PropertyRef Name="PaymentStatusID" />
+      </Principal>
+      <Dependent Role="tblOrder">
+        <PropertyRef Name="PaymentStatusID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblOrder_tblProduct">
+    <End Type="OnRampDBModel.tblProduct" Role="tblProduct" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblOrder" Role="tblOrder" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblProduct">
+        <PropertyRef Name="Barcode" />
+      </Principal>
+      <Dependent Role="tblOrder">
+        <PropertyRef Name="Barcode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblProduct_tblProductCategory">
+    <End Type="OnRampDBModel.tblProductCategory" Role="tblProductCategory" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblProduct" Role="tblProduct" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblProductCategory">
+        <PropertyRef Name="CategoryID" />
+      </Principal>
+      <Dependent Role="tblProduct">
+        <PropertyRef Name="ProductCategoryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblProduct_tblProductStatus">
+    <End Type="OnRampDBModel.tblProductStatu" Role="tblProductStatu" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblProduct" Role="tblProduct" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblProductStatu">
+        <PropertyRef Name="ProductStatusID" />
+      </Principal>
+      <Dependent Role="tblProduct">
+        <PropertyRef Name="ProductStatusID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblProduct_tblSupplier">
+    <End Type="OnRampDBModel.tblSupplier" Role="tblSupplier" Multiplicity="0..1" />
+    <End Type="OnRampDBModel.tblProduct" Role="tblProduct" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblSupplier">
+        <PropertyRef Name="SupplierID" />
+      </Principal>
+      <Dependent Role="tblProduct">
+        <PropertyRef Name="SupplierID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

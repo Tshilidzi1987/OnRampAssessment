@@ -1,0 +1,682 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/Home/ProductInStockChart",
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                productInStockFunc(response);
+            },
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "/Home/OrdersWithOutstandingPaymentsChart",
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                ordersWithOutstandingPaymentsFunc(response);
+            },
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "/Home/MonthlyOrdersChart",
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                monthlyOrdersFunc(response);
+            },
+        });
+
+    });
+
+    function productInStockFunc(jsondata) {      
+        var data = {};
+        var _productCategory = [];
+        jsondata.forEach(function (e) {
+            _productCategory.push(e.ProductCategory);
+            data[e.ProductCategory] = e.Count;
+        })
+        var chart = c3.generate({
+            bindto: '#productChart',
+            data: {
+                json: [data],
+                keys: {
+                    value: _productCategory,
+                },
+                type: 'pie'
+            },
+            color: {
+                pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+            },
+            pie: {
+                label: {
+                    format: function (value, ratio, id) {
+                        return value;
+                    }
+                }
+            }
+        });
+    }
+
+    function ordersWithOutstandingPaymentsFunc(jsondata) {
+
+        var data = {};
+        var _productCategory = [];
+        jsondata.forEach(function (e) {
+            _productCategory.push(e.ProductCategory);
+            data[e.ProductCategory] = e.Count;
+        })
+        var chart = c3.generate({
+            bindto: '#outstandingOrdersChart',
+            data: {
+                json: [data],
+                keys: {
+                    value: _productCategory,
+                },
+                type: 'bar'
+            },
+            color: {
+                pattern: ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+            },
+            pie: {
+                label: {
+                    format: function (value, ratio, id) {
+                        return value;
+                    }
+                }
+            }
+        });
+    }
+
+    function monthlyOrdersFunc(jsondata) {
+        
+        var _totalMonthlyOrder = [];
+        var _dateOrder = [];
+        var x_tick = []
+        _dateOrder.push("x");
+        _totalMonthlyOrder.push("Monthly Orders");
+
+        jsondata.forEach(function (e) {            
+            _dateOrder.push(e.OrderDate + "-01");
+            _totalMonthlyOrder.push(e.Count);
+            x_tick.push(e.OrderDate + "-01");
+        });
+       
+        var chart = c3.generate({
+            bindto: '#monthlyTotalOrdersChart',
+            data: {
+                x: 'x',
+                columns: [
+                    _dateOrder,
+                    _totalMonthlyOrder
+                ]
+            },
+            axis: {
+                x: {
+                    type: 'timeseries',
+                    tick: {
+                        // this also works for non timeseries data
+                        values: x_tick
+                    }
+                }
+            }
+           
+        });
+    }
+
+</script>
+
+<style type="text/css">
+    #myInput {
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .pagination {
+        margin: 0px 0px 0px 0px;
+    }
+    .pagination > li > a:focus,
+    .pagination > li > a:hover,
+    .pagination > li > span:focus,
+    .page-link.active {
+        background-color: rgb(238, 238, 238);
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-lg-4" style="text-align:center;">
+            <h3>In Stock</h3>
+            <div id="productChart"></div>
+        </div>
+        <div class="col-lg-4" style="text-align:center;">
+            <h3>Orders with outstanding payments</h3>
+            <div id="outstandingOrdersChart"></div>
+        </div>
+
+        <div class="col-lg-4" style="text-align:center;">
+            <h3>Total Orders (Monthly)</h3>
+            <div id="monthlyTotalOrdersChart"></div>
+        </div>
+    </div>
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- Button trigger modal -->
+            <button type="button" id="btnNewProduct" class="btn btn-success" style="border-radius:20px; font-size:large;" data-toggle="modal" data-target="#addProduct">
+                +
+            </button>
+        </div>
+    </div>
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+    <div class="row">
+        <div class="col-lg-6">
+            <label style=" padding:7px 0px 0px 0px; width:110px;" class="control-label col-sm-4">
+                Rows per grid:
+            </label>
+            <div>
+                <select style="width: 90px;" data-bind="value: pageSize,
+                        optionsCaption: 'All Results',
+                        options: pageSizes, event:{ change: ResetCurrentPage }" class="form-control">
+                </select>
+            </div>
+            <label style=" padding: 0px 0px 0px 0px; width: 110px; margin: -25px 0px 0px 218px" class="control-label col-sm-4">
+                Filter:
+            </label>
+            <div style="margin: -34px 0px 0px 263px;">
+                <select id="drpFilter" class="form-control" data-bind="options: productCategoriesCollection,
+                        optionsText: 'CategoryNameAndDesc',
+                        optionsValue: 'ProductCategoryID',
+                        optionsCaption: 'Choose...'">
+                </select>
+            </div>
+
+
+        </div>
+        <div class="col-lg-6" style="text-align:right;">
+            <a href="#" class="btn btn-primary" onclick="sortFunction()" id="btnFilter">sort</a>
+            <input type="text" id="myInput" onkeyup="searchFunction()" placeholder="search..." title="search">
+        </div>
+    </div>
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+    <!--Grid to display products-->
+    <div class="row" style="margin-right: 0px; margin-left: 0px;">
+        <table id="tblProducts" class="table table-striped table-bordered table-sm" width="100%" cellspacing="0">
+            <thead style="background: #2C3E50; color:#ddd;">
+                <tr>
+                    <th>Barcode</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Supplier</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Warranty</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody class="meterList" data-bind="foreach :PagedResults">
+                <tr>
+                    <td name="Barcode" data-bind="text:Barcode"></td>
+                    <td name="ProductName" data-bind="text:ProductName"></td>
+                    <td name="CategoryDescription" data-bind="text:ProductCategory.CategoryDescription"></td>
+                    <td name="CategoryName" data-bind="text:ProductCategory.CategoryName"></td>
+                    <td name="Location" data-bind="text:Location"></td>
+                    <td name="SupplierName" data-bind="text:Supplier.Name"></td>
+                    <td name="Tel" data-bind="text:Supplier.Tel"></td>
+                    <td name="StatusDescription" data-bind="text:ProductStatus.StatusDescription"></td>
+                    <td name="Warranty" data-bind="text:Warranty"></td>
+                    <td>
+                        <button name="btnEditProduct" data-bind="value:[ProductCategory.ProductCategoryID,Supplier.SupplierID,ProductStatus.ProductStatusID]" type="button" class="btn btn-primary btnEditProduct" data-toggle="modal" data-target="#editProduct">edit</button>
+                        <button name="btnDeleteProduct" data-bind="value:Barcode" type="button" class="btn btn-warning btnDeleteProduct">delete</button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfooter>
+                <tr>
+                    <td colspan="10" class="text-center">
+                        <ul data-bind="foreach: PageList" class="pagination">
+                            <li class="page-item">
+                                <a href="#" class="page-link" data-bind="text: $data + 1, click: GoToPage, css: GetClass($data)"></a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </tfooter>
+        </table>
+    </div>
+    <!--End Grid-->
+    <!--add product modal-->
+    <div class="modal fade" id="addProduct" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">New Product</h4>
+                    <button type="button" class="close" data-dismiss="modal" style="margin-top: -20px !important;" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div>
+                                <h5>BarCode</h5>
+                                <input class="form-control" style="max-width:400px;" type="text" id="txtNewBarCode" />
+                            </div>
+                            <div>
+                                <h5>Category</h5>
+                                <select id="drpNewProductCategory" class="form-control" data-bind="options: productCategoriesCollection,
+                                    optionsText: 'CategoryNameAndDesc',
+                                    optionsValue: 'ProductCategoryID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                            <div>
+                                <h5>Product Status</h5>
+                                <select id="drpNewProductStatus" class="form-control" disabled="disabled" data-bind="options: productStatusCollection,
+                                    optionsText: 'StatusDescription',
+                                    optionsValue: 'ProductStatusID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div>
+                                <h5>Product Name</h5>
+                                <input class="form-control" style="max-width:400px;" type="text" id="txtNewProductName" />
+                            </div>
+                            <div>
+                                <h5>Supplier</h5>
+                                <select id="drpNewSupplier" class="form-control" data-bind="options: supplierCollection,
+                                    optionsText: 'Name',
+                                    optionsValue: 'SupplierID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                            <div>
+                                <div class="col-lg-1" style="padding: 37px 0px 0px 0px;"><h5>Warranty</h5></div>
+                                <div class="col-lg-1" style="padding: 45px 0px 0px 40px;"><input class="checkbox" type="checkbox" id="chkNewWarranty" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h5>Location</h5>
+                            <textarea class="form-control" style="max-width:800px;" id="txtNewLocation"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div style="text-align:left; margin: 0px 0px -34px 0px; color:red;"><label id="lblNewProducts"></label></div> 
+                    <div style="padding: 5px 0px 0px 0px;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveNewProduct">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end modal-->
+    <!-- edit productModal -->
+    <div class="modal fade" id="editProduct" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Product</h4>
+                    <button type="button" class="close" data-dismiss="modal" style="margin-top: -20px !important;" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div>
+                                <h5>BarCode</h5>
+                                <input class="form-control" disabled="disabled" style="max-width:400px;" type="text" id="txtBarCode" />
+                            </div>
+                            <div>
+                                <h5>Category</h5>
+                                <select id="drpProductCategory" class="form-control" data-bind="options: productCategoriesCollection,
+                                    optionsText: 'CategoryNameAndDesc',
+                                    optionsValue: 'ProductCategoryID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                            <div>
+                                <h5>Product Status</h5>
+                                <select id="drpProductStatus" class="form-control" data-bind="options: productStatusCollection,
+                                    optionsText: 'StatusDescription',
+                                    optionsValue: 'ProductStatusID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div>
+                                <h5>Product Name</h5>
+                                <input class="form-control" style="max-width:400px;" type="text" id="txtProductName" />
+                            </div>
+                            <div>
+                                <h5>Supplier</h5>
+                                <select id="drpSupplier" class="form-control" data-bind="options: supplierCollection,
+                                    optionsText: 'Name',
+                                    optionsValue: 'SupplierID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                            <div>
+                                <div class="col-lg-1" style="padding: 37px 0px 0px 0px;"><h5>Warranty</h5></div>
+                                <div class="col-lg-1" style="padding: 45px 0px 0px 40px;"><input class="checkbox" type="checkbox" id="chkWarranty" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h5>Location</h5>
+                            <textarea class="form-control" style="max-width:800px;" id="txtLocation"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveProduct">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end modal-->
+</div>
+
+<script type="text/javascript">
+   
+    function ViewModel() {
+        var vm = this;
+      
+        vm.productCollection = ko.observableArray();
+        vm.supplierCollection = ko.observableArray();
+        vm.productCategoriesCollection = ko.observableArray();
+        vm.productStatusCollection = ko.observableArray();
+
+        vm.pageSizes = [4, 6, 8, 10];
+        vm.pageSize = ko.observable(pageSizes[0]);
+        vm.currentPage = ko.observable(0);
+
+        // returns number of pages required for number of results selected
+        vm.PageCount = ko.computed(function () {
+            if (vm.pageSize()) {
+                return Math.ceil(vm.productCollection().length / vm.pageSize());
+            } else {
+                return 1;
+            }
+        });
+
+        // returns items from the array for the current page
+        vm.PagedResults = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return vm.productCollection().slice(vm.currentPage() * vm.pageSize(), (vm.currentPage() * vm.pageSize()) + vm.pageSize());
+            } else {
+                return vm.productCollection();
+            }
+        });
+
+        // returns a list of numbers for all pages
+        vm.PageList = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return Array.apply(null, {
+                    length: vm.PageCount()
+                }).map(Number.call, Number);
+            }
+        });
+
+        // reset to first page
+        vm.ResetCurrentPage = function () {
+            vm.currentPage(0);
+        }
+        // go to page number
+        vm.GoToPage = function (page) {
+            vm.currentPage(page);
+        }
+        // determines if page # is active returns active class
+        vm.GetClass = function (page) {
+            return (page == vm.currentPage()) ? "active" : "";
+        }
+        // populate list of products
+        vm.GetProducts = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetProducts",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.productCollection(response);
+                    }
+                }
+            });          
+        }
+        vm.GetSuppliers = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetSuppliers",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.supplierCollection(response);
+                    }
+                }
+            });
+        }
+        vm.GetproductCategories = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetProductCatergories",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.productCategoriesCollection(response);
+                    }
+                }
+            });
+        }
+        vm.GetproductStatus = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetProductStatuses",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {               
+                    if (response != "") {
+                        vm.productStatusCollection(response);
+                    }
+                }
+            });
+        }
+
+        vm.GetProducts();
+        vm.GetSuppliers();        
+        vm.GetproductCategories();
+        vm.GetproductStatus();
+    }
+    ko.applyBindings(ViewModel);
+
+    function sortFunction() {
+        //sorting by second & 5th column respectively
+        const t = (tr, i) => tr.cells[i].textContent;
+        $(".meterList tr").get()
+           .sort((a, b) => t(a, 3).localeCompare(t(b, 3)) || t(a, 4).localeCompare(t(b, 4)))
+           .map(tr => $(".meterList").append(tr));
+    }
+    function searchFunction() {
+
+        var filter = $("#myInput").val().toUpperCase();
+        $("table > tbody > tr").each(function () {
+
+            if ($(this).find('td').eq(0).text().toUpperCase().indexOf(filter) > -1 || $(this).find('td').eq(1).text().toUpperCase().indexOf(filter) > -1) {
+                $(this).closest('tr').css("display", "");
+            }
+            else {
+                $(this).closest('tr').css("display", "none");
+            }
+        });
+    }
+
+    $("#btnNewProduct").click(function () {
+        $('#drpNewProductStatus').val(1);
+    });
+
+    $("#saveNewProduct").click(function () {
+        let barcode = $('#txtNewBarCode').val();
+        let productName = $('#txtNewProductName').val();
+        let supplierID = $('#drpNewSupplier option:selected').val();
+        let categoryID = $('#drpNewProductCategory option:selected').val();
+        let productStatusID = $('#drpNewProductStatus option:selected').val();            
+        let warranty = $("#chkNewWarranty").prop("checked");
+        let location = $('#txtNewLocation').val();
+
+        if (barcode === "")
+        {
+            $("#lblNewProducts").text("**barcode for new product is required**");
+            return false;
+        }
+        if (productName === "") {
+            $("#lblNewProducts").text("**name of a new product is required**");
+            return false;
+        }
+        if (categoryID === "") {
+            $("#lblNewProducts").text("**category of a new product is required**");
+            return false;
+        }
+        if (supplierID === "") {
+            $("#lblNewProducts").text("**supplier for a new product is required**");
+            return false;
+        }
+        if (location === "") {
+            $("#lblNewProducts").text("**location of a new product is required**");
+            return false;
+        }
+
+        $.ajax({
+            url: "/Home/AddNewProduct",
+            type: "POST",
+            data: {
+                barcode: barcode,
+                productName: productName,
+                supplierID: supplierID,
+                categoryID: categoryID,
+                productStatusID: productStatusID,
+                warranty: warranty,
+                location: location
+            },
+            dataType: 'json',
+            success: function () { }
+        });
+
+        window.location.reload();
+       
+
+    });
+
+    $("#saveProduct").click(function () {
+        
+        let supplierID = $('#drpSupplier option:selected').val();
+        let categoryID = $('#drpProductCategory option:selected').val();
+        let productStatusID = $('#drpProductStatus option:selected').val();
+        let barcode = $('#txtBarCode').val();
+        let productName = $('#txtProductName').val();        
+        let warranty = $("#chkWarranty").prop("checked");
+        let location = $('#txtLocation').val();
+
+        $.ajax({
+            url: "/Home/EditProduct",
+            type: "POST",
+            data: {
+                supplierID: supplierID,
+                categoryID: categoryID,
+                productStatusID: productStatusID,
+                barcode: barcode,
+                productName: productName,
+                warranty: warranty,
+                location: location
+            },
+            dataType: 'json',
+            success: function () { }
+        });
+      
+        window.location.reload();
+
+    });
+
+    $(document).on("click", "#tblProducts button.btnDeleteProduct", function () {
+        let barCode = $(this).val();
+        $.ajax({
+            url: "/Home/DeleteProduct",
+            type: "POST",
+            data: {
+                barCode: barCode
+            },
+            dataType: 'json',
+            success: function () { }
+        });
+
+        window.location.reload();
+
+    });
+
+    $(document).on("click", "#tblProducts button.btnEditProduct", function () {
+       
+        //n.b selected row bind-values are productCategoryID, supplierID and ProductStatusID respectively        
+        var arrayValues = $(this).val().split(",");
+
+        let productCategoryID = arrayValues[0];
+        $("#drpProductCategory").val(productCategoryID);
+
+        let supplierID = arrayValues[1];
+        $("#drpSupplier").val(supplierID);
+
+        let ProductStatusID = arrayValues[2];
+        $("#drpProductStatus").val(ProductStatusID);
+
+        let tr = $(this).closest('tr');
+        $("#txtBarCode").val(tr.find('td[name="Barcode"]').text());
+        $("#txtProductName").val(tr.find('td[name="ProductName"]').text());             
+        $("#txtLocation").val(tr.find('td[name="Location"]').text());       
+
+        let Warranty = tr.find('td[name="Warranty"]').text();        
+        var isTrueSet = (Warranty === 'true');       
+        $('#chkWarranty').prop('checked', isTrueSet);
+       
+    });
+
+    
+
+</script>
+
+

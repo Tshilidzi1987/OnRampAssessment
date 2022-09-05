@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - OnRamp</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/c3")
+    @Scripts.Render("~/bundles/knockout")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/table2excel")
+
+</head>
+<body style="padding-top:0px !important;">
+    @if (!string.IsNullOrEmpty(Session["username"] as string))
+    {
+
+        <div id="wrapper" class="menuDisplayed">
+            <div style="background-color: #2C3E50; padding: 8px 5px 1px 6px; color: #f5f5f5 ">
+                <img alt="OnRamp" style="padding: 0px 0px 4px 0px;" src="~/Logo/OnRampLogo.PNG" width="200" height="80" />
+                <a href="~/Login/Login" class="btn btn-success" style="float:right;" id="logout">Sign Out</a>
+                <label style="float: right; padding: 51px 0px 0px 0px;">welcome,  @Session["username"].ToString()</label>
+            </div>
+            <div style="background-color:#808080;">
+                <br />
+            </div>
+            <!--sidebar-->
+            <div id="sidebar-wrapper">
+                <ul class="sidebar-nav">
+                    @if (Session["LoginTypeID"].ToString() == "2")
+                    {
+                        <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                        <li>@Html.ActionLink("Orders", "Order", "AdminOrder")</li>
+                        <li>@Html.ActionLink("Suppliers", "Supplier", "Supplier")</li>
+                        <li>@Html.ActionLink("Customers", "Customer", "Customer")</li>
+                        <li>@Html.ActionLink("Categories", "Category", "Category")</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("Order", "CustomerOrder", "CustomerOrder")</li>
+                    }
+                </ul>
+            </div>
+            <!--Page Content-->
+            <div id="page-content-wraper">
+                <a href="#" class="btn btn-success" id="menu-toggle">Toggle Menu</a>
+                @RenderBody()
+                <hr />
+                <footer style="padding: 0px 0px 0px 16px;">
+                    <p>&copy; @DateTime.Now.Year - OnRamp Assessment by: Chris Nemadodzi</p>
+                </footer>
+            </div>
+        </div>
+    }
+    else
+    {
+        @RenderBody()
+        <script>
+            location.href = "/";
+        </script>
+    }
+
+    @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        $("#logout").click(function () {
+
+        });
+        /*menu toggle script*/
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("menuDisplayed");
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

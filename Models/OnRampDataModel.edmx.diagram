@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="57c2d2a6c869423e846d046f184f5075" Name="Diagram1" ZoomLevel="100">
+        <EntityTypeShape EntityType="OnRampDBModel.sysdiagram" Width="1.5" PointX="5.75" PointY="5.75" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblCustomer" Width="1.5" PointX="3" PointY="11.375" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblLogin" Width="1.5" PointX="0.75" PointY="11.5" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblLoginType" Width="1.5" PointX="1.5" PointY="14.875" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblOrder" Width="1.5" PointX="5.25" PointY="1.125" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblPaymentStatu" Width="1.5" PointX="3" PointY="6" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblProduct" Width="1.5" PointX="3" PointY="1" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblProductCategory" Width="1.5" PointX="0.75" PointY="1.75" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblProductStatu" Width="1.5" PointX="0.75" PointY="8.5" />
+        <EntityTypeShape EntityType="OnRampDBModel.tblSupplier" Width="1.5" PointX="0.75" PointY="5.625" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblCustomer_tblLogin" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblOrder_tblCustomer" />
+        <AssociationConnector Association="OnRampDBModel.FK_Login_LoginType" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblOrder_tblPaymentStatus" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblOrder_tblProduct" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblProduct_tblProductCategory" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblProduct_tblProductStatus" />
+        <AssociationConnector Association="OnRampDBModel.FK_tblProduct_tblSupplier" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,299 @@
+﻿
+@{
+    ViewBag.Title = "CustomerOrder";
+}
+
+<style type="text/css">
+    #myInput {
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .pagination {
+        margin: 0px 0px 0px 0px;
+    }
+
+    .pagination > li > a:focus,
+    .pagination > li > a:hover,
+    .pagination > li > span:focus,
+    .page-link.active {
+        background-color: rgb(238, 238, 238);
+    }
+</style>
+
+<div class="container-fluid">
+
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+    <div class="row" style="text-align:center;">
+        <h3>Availalbe Product</h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <label style=" padding:7px 0px 0px 0px; width:110px;" class="control-label col-sm-4">
+                Rows per grid:
+            </label>
+            <div>
+                <select style="width: 90px;" data-bind="value: pageSize,
+                        optionsCaption: 'All Results',
+                        options: pageSizes, event:{ change: ResetCurrentPage }" class="form-control">
+                </select>
+            </div>
+
+        </div>
+        <div class="col-lg-6" style="text-align:right;">
+            <a href="#" class="btn btn-primary" onclick="sortFunction()" id="btnFilter">filter</a>
+            <input type="text" id="myInput" onkeyup="searchFunction()" placeholder="search..." title="search">
+        </div>
+    </div>
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+    <input type="hidden" id="HiddenLoginID" value="@Session["loginID"].ToString()"/>
+    <!--Grid to display products-->
+    <div class="row" style="margin-right: 0px; margin-left: 0px;">
+        <table id="tblProducts" class="table table-striped table-bordered table-sm" width="100%" cellspacing="0">
+            <thead style="background: #2C3E50; color:#ddd;">
+                <tr>
+                    <th>Barcode</th>
+                    <th>Product</th>
+                    <th>Description</th>                    
+                    <th>Location</th>
+                    <th>Supplier</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Warranty</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody class="meterList" data-bind="foreach :PagedResults">
+                <tr>
+                    <td name="Barcode" data-bind="text:Barcode"></td>
+                    <td name="ProductName" data-bind="text:ProductName"></td>
+                    <td name="CategoryDescription" data-bind="text:ProductCategory.CategoryNameAndDesc"></td>                    
+                    <td name="Location" data-bind="text:Location"></td>
+                    <td name="SupplierName" data-bind="text:Supplier.Name"></td>
+                    <td name="Tel" data-bind="text:Supplier.Tel"></td>
+                    <td name="StatusDescription" data-bind="text:ProductStatus.StatusDescription"></td>
+                    <td name="Warranty" data-bind="text:Warranty"></td>
+                    <td>
+                        <button name="btnOrder" data-bind="value:[Barcode,ProductName,Supplier.SupplierID]" type="button" class="btn btn-warning btnOrderProduct">order</button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfooter>
+                <tr>
+                    <td colspan="10" class="text-center">
+                        <ul data-bind="foreach: PageList" class="pagination">
+                            <li class="page-item">
+                                <a href="#" class="page-link" data-bind="text: $data + 1, click: GoToPage, css: GetClass($data)"></a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </tfooter>
+        </table>
+    </div>
+    <!--End Grid-->
+    <div class="row" style="text-align:center;">
+        <h3>Items Ordered</h3>
+    </div>
+    <!--Grid to display products-->
+    <div class="row" style="margin-right: 0px; margin-left: 0px;">
+        <table id="tblOrderedProducts" class="table table-striped table-bordered table-sm" width="100%" cellspacing="0">
+            <thead style="background: #2C3E50; color:#ddd;">
+                <tr>
+                    <th>Barcode</th>
+                    <th>Order</th>
+                    <th>Description</th>                   
+                    <th>Location</th>
+                    <th>Supplier</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Warranty</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody class="meterList" data-bind="foreach :orderedCollection">
+                <tr>
+                    <td name="Barcode" data-bind="text:Barcode"></td>
+                    <td name="ProductName" data-bind="text:OrderName"></td>
+                    <td name="CategoryDescription" data-bind="text:ProductCategory.CategoryNameAndDesc"></td>                    
+                    <td name="Location" data-bind="text:Products.Location"></td>
+                    <td name="SupplierName" data-bind="text:Supplier.Name"></td>
+                    <td name="Tel" data-bind="text:Supplier.Tel"></td>
+                    <td name="StatusDescription" data-bind="text:ProductStatus.StatusDescription"></td>
+                    <td name="Warranty" data-bind="text:Products.Warranty"></td>
+                    <td>
+                        <button name="btnCancelOrder" data-bind="value:[Barcode]" type="button" class="btn btn-primary btnCancelOrder">cancel</button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfooter>
+                <tr>
+                    <td colspan="10" class="text-center">
+                        @*<ul data-bind="foreach: PageList" class="pagination">
+                            <li class="page-item">
+                                <a href="#" class="page-link" data-bind="text: $data + 1, click: GoToPage, css: GetClass($data)"></a>
+                            </li>
+                        </ul>*@
+                    </td>
+                </tr>
+            </tfooter>
+        </table>
+    </div>
+    <!--End Grid-->
+</div>
+
+<script type="text/javascript">
+
+    function ViewModel() {
+        var vm = this;
+
+        vm.productCollection = ko.observableArray();
+        vm.orderedCollection = ko.observableArray();
+        vm.pageSizes = [4, 6, 8, 10];
+        vm.pageSize = ko.observable(pageSizes[0]);
+        vm.currentPage = ko.observable(0);
+
+        // returns number of pages required for number of results selected
+        vm.PageCount = ko.computed(function () {
+            if (vm.pageSize()) {
+                return Math.ceil(vm.productCollection().length / vm.pageSize());
+            } else {
+                return 1;
+            }
+        });
+
+        // returns items from the array for the current page
+        vm.PagedResults = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return vm.productCollection().slice(vm.currentPage() * vm.pageSize(), (vm.currentPage() * vm.pageSize()) + vm.pageSize());
+            } else {
+                return vm.productCollection();
+            }
+        });
+
+        // returns a list of numbers for all pages
+        vm.PageList = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return Array.apply(null, {
+                    length: vm.PageCount()
+                }).map(Number.call, Number);
+            }
+        });
+
+        // reset to first page
+        vm.ResetCurrentPage = function () {
+            vm.currentPage(0);
+        }
+        // go to page number
+        vm.GoToPage = function (page) {
+            vm.currentPage(page);
+        }
+        // determines if page # is active returns active class
+        vm.GetClass = function (page) {
+            return (page == vm.currentPage()) ? "active" : "";
+        }
+        // populate list of products
+        vm.GetProducts = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetProducts",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.productCollection(response);
+                    }
+                }
+            });
+        }
+        vm.OrderedProducts = function () {          
+           
+            $.ajax({
+                type: "GET",
+                url: "/CustomerOrder/OrderedProduct",
+                data: { loginID: $("#HiddenLoginID").val() },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.orderedCollection(response);
+                    }                   
+                }               
+            });
+            
+        }
+        vm.OrderedProducts();
+        vm.GetProducts();
+    }
+
+    function searchFunction() {
+
+        var filter = $("#myInput").val().toUpperCase();
+        $("table > tbody > tr").each(function () {
+
+            if ($(this).find('td').eq(0).text().toUpperCase().indexOf(filter) > -1 || $(this).find('td').eq(1).text().toUpperCase().indexOf(filter) > -1) {
+                $(this).closest('tr').css("display", "");
+            }
+            else {
+                $(this).closest('tr').css("display", "none");
+            }
+        });
+    }
+   
+    $(document).on("click", "#tblProducts button.btnOrderProduct", function () {
+        
+        var arrayValues = $(this).val().split(",");
+        var barcode = arrayValues[0];
+        var productname = arrayValues[1];
+        var supplierID = arrayValues[2];
+
+        $.ajax({
+            type: "GET",
+            url: "/Customer/GetCustomerByLoginID",
+            data: { loginID: $("#HiddenLoginID").val() },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {               
+                if (response != "") {                   
+                    $.ajax({
+                        type: "POST",
+                        url: "/CustomerOrder/NewOrder",                        
+                        data: { customerID: response.CustomerID, barcode: barcode, productname: productname, supplierID: supplierID },
+                        dataType: 'json',
+                        success: function (response) {}                       
+                    });
+                }
+            }
+        });
+        
+        location.reload();
+    });
+
+    $(document).on("click", "#tblOrderedProducts button.btnCancelOrder", function () {
+
+        var barcode = $(this).val();       
+        $.ajax({
+            type: "GET",
+            url: "/CustomerOrder/CancelOrder",
+            data: { barcode: barcode },
+            dataType: "json",
+            success: function (response) {}
+        });
+
+        location.reload();
+    });
+    ko.applyBindings(ViewModel);
+</script>
+
+

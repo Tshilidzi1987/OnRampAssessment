@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="OnRampDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="principal_id" Type="int" Nullable="false" />
+    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="version" Type="int" />
+    <Property Name="definition" Type="varbinary(max)" />
+  </EntityType>
+  <EntityType Name="tblCustomer">
+    <Key>
+      <PropertyRef Name="CustomerID" />
+    </Key>
+    <Property Name="CustomerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="150" />
+    <Property Name="Email" Type="nvarchar" MaxLength="50" />
+    <Property Name="Tel" Type="nvarchar" MaxLength="10" />
+    <Property Name="Address" Type="nvarchar" MaxLength="50" />
+    <Property Name="LoginID" Type="int" />
+  </EntityType>
+  <EntityType Name="tblLogin">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Username" Type="nvarchar" MaxLength="250" />
+    <Property Name="Password" Type="char" MaxLength="60" />
+    <Property Name="DateRegistered" Type="datetime" />
+    <Property Name="roleID" Type="int" />
+  </EntityType>
+  <EntityType Name="tblLoginType">
+    <Key>
+      <PropertyRef Name="roleID" />
+    </Key>
+    <Property Name="roleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Type" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="tblOrder">
+    <Key>
+      <PropertyRef Name="OrderID" />
+    </Key>
+    <Property Name="OrderID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CustomerID" Type="int" />
+    <Property Name="Barcode" Type="char" MaxLength="13" />
+    <Property Name="ProductName" Type="nvarchar" MaxLength="250" />
+    <Property Name="SupplierID" Type="int" />
+    <Property Name="DateCaptured" Type="datetime" />
+    <Property Name="DateSold" Type="datetime" />
+    <Property Name="PaymentStatusID" Type="int" />
+  </EntityType>
+  <EntityType Name="tblPaymentStatus">
+    <Key>
+      <PropertyRef Name="PaymentStatusID" />
+    </Key>
+    <Property Name="PaymentStatusID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="tblProduct">
+    <Key>
+      <PropertyRef Name="Barcode" />
+    </Key>
+    <Property Name="Barcode" Type="char" MaxLength="13" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="50" />
+    <Property Name="DateCaptured" Type="datetime" />
+    <Property Name="Location" Type="nvarchar" MaxLength="50" />
+    <Property Name="Warranty" Type="bit" />
+    <Property Name="ProductStatusID" Type="int" />
+    <Property Name="SupplierID" Type="int" />
+    <Property Name="ProductCategoryID" Type="int" />
+  </EntityType>
+  <EntityType Name="tblProductCategory">
+    <Key>
+      <PropertyRef Name="CategoryID" />
+    </Key>
+    <Property Name="CategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="250" />
+    <Property Name="Description" Type="nvarchar" MaxLength="250" />
+  </EntityType>
+  <EntityType Name="tblProductStatus">
+    <Key>
+      <PropertyRef Name="ProductStatusID" />
+    </Key>
+    <Property Name="ProductStatusID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="tblSupplier">
+    <Key>
+      <PropertyRef Name="SupplierID" />
+    </Key>
+    <Property Name="SupplierID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="250" />
+    <Property Name="Email" Type="nvarchar" MaxLength="50" />
+    <Property Name="Tel" Type="char" MaxLength="10" />
+    <Property Name="Address" Type="nvarchar" MaxLength="150" />
+  </EntityType>
+  <Association Name="FK_Login_LoginType">
+    <End Role="tblLoginType" Type="Self.tblLoginType" Multiplicity="0..1" />
+    <End Role="tblLogin" Type="Self.tblLogin" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblLoginType">
+        <PropertyRef Name="roleID" />
+      </Principal>
+      <Dependent Role="tblLogin">
+        <PropertyRef Name="roleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblCustomer_tblLogin">
+    <End Role="tblLogin" Type="Self.tblLogin" Multiplicity="0..1" />
+    <End Role="tblCustomer" Type="Self.tblCustomer" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblLogin">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="tblCustomer">
+        <PropertyRef Name="LoginID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblOrder_tblCustomer">
+    <End Role="tblCustomer" Type="Self.tblCustomer" Multiplicity="0..1" />
+    <End Role="tblOrder" Type="Self.tblOrder" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblCustomer">
+        <PropertyRef Name="CustomerID" />
+      </Principal>
+      <Dependent Role="tblOrder">
+        <PropertyRef Name="CustomerID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblOrder_tblPaymentStatus">
+    <End Role="tblPaymentStatus" Type="Self.tblPaymentStatus" Multiplicity="0..1" />
+    <End Role="tblOrder" Type="Self.tblOrder" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblPaymentStatus">
+        <PropertyRef Name="PaymentStatusID" />
+      </Principal>
+      <Dependent Role="tblOrder">
+        <PropertyRef Name="PaymentStatusID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblOrder_tblProduct">
+    <End Role="tblProduct" Type="Self.tblProduct" Multiplicity="0..1" />
+    <End Role="tblOrder" Type="Self.tblOrder" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblProduct">
+        <PropertyRef Name="Barcode" />
+      </Principal>
+      <Dependent Role="tblOrder">
+        <PropertyRef Name="Barcode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblProduct_tblProductCategory">
+    <End Role="tblProductCategory" Type="Self.tblProductCategory" Multiplicity="0..1" />
+    <End Role="tblProduct" Type="Self.tblProduct" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblProductCategory">
+        <PropertyRef Name="CategoryID" />
+      </Principal>
+      <Dependent Role="tblProduct">
+        <PropertyRef Name="ProductCategoryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblProduct_tblProductStatus">
+    <End Role="tblProductStatus" Type="Self.tblProductStatus" Multiplicity="0..1" />
+    <End Role="tblProduct" Type="Self.tblProduct" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblProductStatus">
+        <PropertyRef Name="ProductStatusID" />
+      </Principal>
+      <Dependent Role="tblProduct">
+        <PropertyRef Name="ProductStatusID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblProduct_tblSupplier">
+    <End Role="tblSupplier" Type="Self.tblSupplier" Multiplicity="0..1" />
+    <End Role="tblProduct" Type="Self.tblProduct" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblSupplier">
+        <PropertyRef Name="SupplierID" />
+      </Principal>
+      <Dependent Role="tblProduct">
+        <PropertyRef Name="SupplierID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+  <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+    <Parameter Name="version" Type="int" Mode="In" />
+    <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+  </Function>
+  <Function Name="sp_creatediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+    <Parameter Name="version" Type="int" Mode="In" />
+    <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+  </Function>
+  <Function Name="sp_dropdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_helpdiagramdefinition" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_helpdiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_renamediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+    <Parameter Name="new_diagramname" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="sp_upgraddiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <EntityContainer Name="OnRampDBModelStoreContainer">
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblCustomer" EntityType="Self.tblCustomer" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblLogin" EntityType="Self.tblLogin" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblLoginType" EntityType="Self.tblLoginType" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblOrder" EntityType="Self.tblOrder" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblPaymentStatus" EntityType="Self.tblPaymentStatus" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblProduct" EntityType="Self.tblProduct" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblProductCategory" EntityType="Self.tblProductCategory" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblProductStatus" EntityType="Self.tblProductStatus" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tblSupplier" EntityType="Self.tblSupplier" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_Login_LoginType" Association="Self.FK_Login_LoginType">
+      <End Role="tblLoginType" EntitySet="tblLoginType" />
+      <End Role="tblLogin" EntitySet="tblLogin" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblCustomer_tblLogin" Association="Self.FK_tblCustomer_tblLogin">
+      <End Role="tblLogin" EntitySet="tblLogin" />
+      <End Role="tblCustomer" EntitySet="tblCustomer" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblOrder_tblCustomer" Association="Self.FK_tblOrder_tblCustomer">
+      <End Role="tblCustomer" EntitySet="tblCustomer" />
+      <End Role="tblOrder" EntitySet="tblOrder" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblOrder_tblPaymentStatus" Association="Self.FK_tblOrder_tblPaymentStatus">
+      <End Role="tblPaymentStatus" EntitySet="tblPaymentStatus" />
+      <End Role="tblOrder" EntitySet="tblOrder" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblOrder_tblProduct" Association="Self.FK_tblOrder_tblProduct">
+      <End Role="tblProduct" EntitySet="tblProduct" />
+      <End Role="tblOrder" EntitySet="tblOrder" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblProduct_tblProductCategory" Association="Self.FK_tblProduct_tblProductCategory">
+      <End Role="tblProductCategory" EntitySet="tblProductCategory" />
+      <End Role="tblProduct" EntitySet="tblProduct" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblProduct_tblProductStatus" Association="Self.FK_tblProduct_tblProductStatus">
+      <End Role="tblProductStatus" EntitySet="tblProductStatus" />
+      <End Role="tblProduct" EntitySet="tblProduct" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblProduct_tblSupplier" Association="Self.FK_tblProduct_tblSupplier">
+      <End Role="tblSupplier" EntitySet="tblSupplier" />
+      <End Role="tblProduct" EntitySet="tblProduct" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

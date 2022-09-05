@@ -1,0 +1,312 @@
+﻿
+@{
+    ViewBag.Title = "Order";
+}
+
+<style type="text/css">
+    #myInput {
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .pagination {
+        margin: 0px 0px 0px 0px;
+    }
+
+        .pagination > li > a:focus,
+        .pagination > li > a:hover,
+        .pagination > li > span:focus,
+        .page-link.active {
+            background-color: rgb(238, 238, 238);
+        }
+</style>
+
+<div class="container-fluid">
+
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+    <div class="row" style="text-align:center;">
+        <h3>Ordered Items</h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <label style=" padding:7px 0px 0px 0px; width:110px;" class="control-label col-sm-4">
+                Rows per grid:
+            </label>
+            <div>
+                <select style="width: 90px;" data-bind="value: pageSize,
+                        optionsCaption: 'All Results',
+                        options: pageSizes, event:{ change: ResetCurrentPage }" class="form-control">
+                </select>
+            </div>
+            <div style="margin: -34px 191px 0px 0px">
+                <button style="float: right; margin: 5px 2px 0px 0px;" id="btnExport">export to csv</button>
+            </div>
+
+        </div>
+        <div class="col-lg-6" style="text-align:right;">
+            <a href="#" class="btn btn-primary" onclick="sortFunction()" id="btnFilter">filter</a>
+            <input type="text" id="myInput" onkeyup="searchFunction()" placeholder="search..." title="search">
+        </div>
+    </div>
+    <hr style="margin-top:7px; margin-bottom:7px;" />
+
+    <!--Grid to display products-->
+    <div class="row" style="margin-right: 0px; margin-left: 0px;">
+        <table id="tblOrderedProducts" class="table table-striped table-bordered table-sm" width="100%" cellspacing="0">
+            <thead style="background: #2C3E50; color:#ddd;">
+                <tr>
+                    <th style="text-align:center">Customer</th>
+                    <th style="text-align:center">Order</th>
+                    <th style="text-align:center">Description</th>
+                    <th style="text-align:center">Barcode</th>
+                    <th style="text-align:center">Location</th>
+                    <th style="text-align:center">Supplier</th>
+                    <th style="text-align:center">Contact</th>
+                    <th style="text-align:center">Product Status</th>
+                    <th style="text-align:center">Payment tStatus</th>
+                    <th style="text-align:center">Warranty</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody class="meterList" data-bind="foreach :PagedResults">
+                <tr>
+                    <td style="text-align:center" name="CustomerName" data-bind="text:Customer.Name"></td>
+                    <td style="text-align:center" name="OrderName" data-bind="text:OrderName"></td>
+                    <td style="text-align:center" name="CategoryName" data-bind="text:ProductCategory.CategoryNameAndDesc"></td>
+                    <td style="text-align:center" name="Barcode" data-bind="text:Barcode"></td>
+                    <td style="text-align:center" name="Location" data-bind="text:Products.Location"></td>
+                    <td style="text-align:center" name="SupplierName" data-bind="text:Supplier.Name"></td>
+                    <td style="text-align:center" name="Tel" data-bind="text:Supplier.Tel"></td>
+                    <td style="text-align:center" name="ProductStatusDescription" data-bind="text:ProductStatus.StatusDescription"></td>
+                    <td style="text-align:center" name="PaymentStatusDescription" data-bind="text:PaymentStatus.paymentStatusDescription"></td>
+                    <td style="text-align:center" name="Warranty" data-bind="text:Products.Warranty"></td>
+                    <td>
+                        <button name="btnSelectOrder" data-bind="value:[ProductStatus.ProductStatusID,PaymentStatus.paymentStatusID,Barcode]" type="button" class="btn btn-primary btnSelectOrder" data-toggle="modal" data-target="#updateOrder">update</button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfooter>
+                <tr>
+                    <td colspan="10" class="text-center">
+                        <ul data-bind="foreach: PageList" class="pagination">
+                            <li class="page-item">
+                                <a href="#" class="page-link" data-bind="text: $data + 1, click: GoToPage, css: GetClass($data)"></a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </tfooter>
+        </table>
+    </div>
+    <!--End Grid-->
+    <input type="hidden" id="txtHiddenBarCodeValue" />
+    <!-- Modal -->
+    <div class="modal fade" id="updateOrder" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">update order</h4>
+                    <button type="button" class="close" data-dismiss="modal" style="margin-top: -20px !important;" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div>
+                                <h5>product status</h5>
+                                <select id="drpProductStatus" class="form-control" data-bind="options: productStatusCollection,
+                                    optionsText: 'StatusDescription',
+                                    optionsValue: 'ProductStatusID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div>
+                                <h5>payment status</h5>
+                                <select id="drpPaymentStatus" class="form-control" data-bind="options: paymentStatusCollection,
+                                    optionsText: 'paymentStatusDescription',
+                                    optionsValue: 'paymentStatusID',
+                                    optionsCaption: 'Choose...'">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnUpdateOrder">update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end modal-->
+</div>
+
+<script type="text/javascript">
+
+    function ViewModel() {
+        var vm = this;
+        vm.orderedCollection = ko.observableArray();
+        vm.productStatusCollection = ko.observableArray();
+        vm.paymentStatusCollection = ko.observableArray();
+        vm.pageSizes = [4, 6, 8, 10];
+        vm.pageSize = ko.observable(pageSizes[0]);
+        vm.currentPage = ko.observable(0);
+
+        // returns number of pages required for number of results selected
+        vm.PageCount = ko.computed(function () {
+            if (vm.pageSize()) {
+                return Math.ceil(vm.orderedCollection().length / vm.pageSize());
+            } else {
+                return 1;
+            }
+        });
+
+        // returns items from the array for the current page
+        vm.PagedResults = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return vm.orderedCollection().slice(vm.currentPage() * vm.pageSize(), (vm.currentPage() * vm.pageSize()) + vm.pageSize());
+            } else {
+                return vm.orderedCollection();
+            }
+        });
+
+        // returns a list of numbers for all pages
+        vm.PageList = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return Array.apply(null, {
+                    length: vm.PageCount()
+                }).map(Number.call, Number);
+            }
+        });
+
+        // reset to first page
+        vm.ResetCurrentPage = function () {
+            vm.currentPage(0);
+        }
+        // go to page number
+        vm.GoToPage = function (page) {
+            vm.currentPage(page);
+        }
+        // determines if page # is active returns active class
+        vm.GetClass = function (page) {
+            return (page == vm.currentPage()) ? "active" : "";
+        }
+        // populate list of ordered items        
+        vm.OrderedProducts = function () {
+
+            $.ajax({
+                type: "GET",
+                url: "/AdminOrder/OrderedProduct",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.orderedCollection(response);
+                    }
+                }
+            });
+
+        }
+        vm.GetproductStatus = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetProductStatuses",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.productStatusCollection(response);
+                    }
+                }
+            });
+        }
+        vm.GetpaymentStatus = function () {
+            $.ajax({
+                type: "GET",
+                url: "/AdminOrder/PaymentStatuses",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.paymentStatusCollection(response);
+                    }
+                }
+            });
+        }
+        vm.OrderedProducts();
+        vm.GetproductStatus();
+        vm.GetpaymentStatus();
+    }
+    ko.applyBindings(ViewModel);
+
+    $("#btnExport").click(function () {
+
+        $("#tblOrderedProducts").table2excel({
+            exclude: ".noExport",
+            name: "Data",
+            filename: "OrderedItems",
+            sheetName: "Order"
+        });
+
+    });
+
+    function searchFunction() {
+
+        var filter = $("#myInput").val().toUpperCase();
+        $("table > tbody > tr").each(function () {
+
+            if ($(this).find('td').eq(0).text().toUpperCase().indexOf(filter) > -1 || $(this).find('td').eq(3).text().toUpperCase().indexOf(filter) > -1) {
+                $(this).closest('tr').css("display", "");
+            }
+            else {
+                $(this).closest('tr').css("display", "none");
+            }
+        });
+    }  
+
+    $(document).on("click", "#tblOrderedProducts button.btnSelectOrder", function () {
+
+        var arrayValues = $(this).val().split(",");        
+        let productStatusID = arrayValues[0];
+        let paymentStatusID = arrayValues[1];
+        let barcode = arrayValues[2];
+        $("#drpProductStatus").val(productStatusID);
+        $("#drpPaymentStatus").val(paymentStatusID);
+        $("#txtHiddenBarCodeValue").val(barcode);       
+    });
+
+    $("#btnUpdateOrder").click(function () {
+      
+        $.ajax({
+            type: "POST",
+            url: "/AdminOrder/UpdateOrderPaymentAndProductStatuses",
+            data: {
+                productStatusID: $("#drpProductStatus").val(),
+                paymentStatusID: $("#drpPaymentStatus").val(),
+                barcode: $("#txtHiddenBarCodeValue").val()
+            },
+            dataType: "json",
+            success: function (response) {}
+        });
+        location.reload();
+    });
+
+</script>
+
+

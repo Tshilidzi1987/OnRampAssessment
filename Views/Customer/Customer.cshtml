@@ -1,0 +1,345 @@
+﻿@{
+    ViewBag.Title = "Customer";
+}
+
+<style>
+    body {
+        font-size: 12px;
+    }
+
+    .pagination {
+        margin: 8px 0px 2px 0px;
+    }
+
+    .form-control {
+        height: 30px;
+        padding: 0px 0px 0px 0px;
+        font-size: 13px;
+        line-height: 0;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8" style="text-align:center;">
+            <h3>Customer details</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8" style="border-radius: 10px; padding: 5px 0px 15px 10px; margin: 0px 0px 13px 11px; border: solid; border-color: #ddd;">
+            <div class="row" style="margin-right: 0px; margin-left: 0px;">
+                <div class="col-lg-6">
+                    <h5>username</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtUsername" />
+                    </div>
+                    <h5>customer name</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtCustomerName" />
+                    </div>
+                    <h5>customer address</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtAddress" />
+                    </div>
+                    <div>
+                        <label style="padding: 11px 0px 0px 0px; color: red; font-size: 17px;" id="lblvalidation"></label>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h5>password</h5>
+                    <div>
+                        <input class="form-control" type="password" id="txtPassword" />
+                    </div>
+                    <h5>customer email</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtEmail" />
+                    </div>
+                    <h5>customer tel</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtTel" />
+                    </div>
+                    <div style=" padding: 9px 44px 0px 0px; float:right;">
+                        <button type="submit" id="btnAdd" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="border-radius: 10px; padding: 20px 18px 5px 15px; margin: 0px 0px 13px 11px; border: solid; border-color: #ddd; ">
+
+            <div class="row">
+                <div class="col-lg-6" style="padding: 0px 0px 5px 15px;">
+                    <label style=" padding:7px 0px 0px 0px; width:87px;" class="control-label col-sm-4">
+                        Rows per grid:
+                    </label>
+                    <div>
+                        <select style="width: 60px;" data-bind="value: pageSize,
+                        optionsCaption: 'All Results',
+                        options: pageSizes, event:{ change: ResetCurrentPage }" class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <button style="float: right; margin: 5px 2px 0px 0px;" id="btnExport">export to csv</button>
+                </div>
+            </div>
+            <!--Grid to display customers-->
+            <table id="tblCustomer" class="table table-striped table-bordered table-sm" width="100%" cellspacing="0">
+                <thead style="background: #2C3E50; color:#ddd;">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Tel</th>
+                        <th>Address</th>
+                        <th width="20%"></th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach :PagedResults">
+                    <tr>
+                        <td name="Name" data-bind="text:Name"></td>
+                        <td name="Email" data-bind="text:Email"></td>
+                        <td name="Tel" data-bind="text:Tel"></td>
+                        <td name="Address" data-bind="text:Address"></td>
+                        <td>
+                            <button name="btnEditCustomer" data-bind="value:CustomerID" type="button" class="btn btn-primary btnEditCustomer" data-toggle="modal" data-target="#editCustomer">edit</button>
+                            <button name="btnDeleteCustomer" data-bind="value:CustomerID" type="button" class="btn btn-warning btnDeleteCustomer">delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfooter>
+                    <tr>
+                        <td colspan="10" class="text-center">
+                            <ul data-bind="foreach: PageList" class="pagination">
+                                <li class="page-item">
+                                    <a href="#" class="page-link" data-bind="text: $data + 1, click: GoToPage, css: GetClass($data)"></a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tfooter>
+            </table>
+            <!--End Grid-->
+        </div>
+    </div>
+</div>
+<input type="hidden" id="txtHiddenCustomerValue" />
+<!-- Modal -->
+<div class="modal fade" id="editCustomer" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Customer</h4>
+                <button type="button" class="close" data-dismiss="modal" style="margin-top: -20px !important;" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div>
+                            <h5>Name</h5>
+                            <input class="form-control" style="max-width:400px;" type="text" id="txteditName" />
+                        </div>
+                        <div>
+                            <h5>Email</h5>
+                            <input class="form-control" style="max-width:400px;" type="text" id="txteditEmail" />
+                        </div>                       
+                    </div>
+                    <div class="col-lg-6">
+                        <div>
+                            <h5>Tel</h5>
+                            <input class="form-control" style="max-width:400px;" type="text" id="txteditTel" />
+                        </div>
+                        <div>
+                            <h5>Address</h5>
+                            <input class="form-control" style="max-width:400px;" type="text" id="txteditAddress" />
+                        </div>
+                    </div>
+                </div>                
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateCustomer">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end modal-->
+
+<script type="text/javascript">
+    function ViewModel() {
+        var vm = this;
+
+        vm.customerCollection = ko.observableArray();
+
+        vm.pageSizes = [5, 10, 20];
+        vm.pageSize = ko.observable(pageSizes[0]);
+        vm.currentPage = ko.observable(0);
+
+        // returns number of pages required for number of results selected
+        vm.PageCount = ko.computed(function () {
+            if (vm.pageSize()) {
+                return Math.ceil(vm.customerCollection().length / vm.pageSize());
+            } else {
+                return 1;
+            }
+        });
+
+        // returns items from the array for the current page
+        vm.PagedResults = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return vm.customerCollection().slice(vm.currentPage() * vm.pageSize(), (vm.currentPage() * vm.pageSize()) + vm.pageSize());
+            } else {
+                return vm.customerCollection();
+            }
+        });
+
+        // returns a list of numbers for all pages
+        vm.PageList = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return Array.apply(null, {
+                    length: vm.PageCount()
+                }).map(Number.call, Number);
+            }
+        });
+
+        // reset to first page
+        vm.ResetCurrentPage = function () {
+            vm.currentPage(0);
+        }
+        // go to page number
+        vm.GoToPage = function (page) {
+            vm.currentPage(page);
+        }
+        // determines if page # is active returns active class
+        vm.GetClass = function (page) {
+            return (page == vm.currentPage()) ? "active" : "";
+        }
+        // populate list of products
+        vm.GetCustomers = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Customer/GetCustomer",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.customerCollection(response);
+                    }
+                }
+            });
+        }
+        vm.GetCustomers();
+    }
+    ko.applyBindings(ViewModel);
+
+    $("#btnExport").click(function () {
+
+        $("#tblCustomer").table2excel({
+            exclude: ".noExport",
+            name: "Data",
+            filename: "Workbook",
+            sheetName: "customers"
+        });
+
+    });
+    $("#btnAdd").click(function () {
+
+        var username = $("#txtUsername").val();
+        var password = $("#txtPassword").val();
+        var name = $("#txtCustomerName").val();
+        var email = $("#txtEmail").val();
+        var tel = $("#txtTel").val();
+        var address = $("#txtAddress").val();
+  
+        if (username === "") {
+            $("#lblvalidation").text("**username is required**");
+            return false;
+        }
+        if (password === "") {
+            $("#lblvalidation").text("**password is required**");
+            return false;
+        }
+        if (name === "") {
+            $("#lblvalidation").text("** customer name is required**");
+            return false;
+        }
+        if (email === "") {
+            $("#lblvalidation").text("**customer email is required**");
+            return false;
+        }
+        if (tel === "") {
+            $("#lblvalidation").text("**customer tel is required**");
+            return false;
+        }
+        if (address === "") {
+            $("#lblvalidation").text("**customer address is required**");
+            return false;
+        }    
+       
+        $.ajax({
+            type: "POST",
+            url: "/Customer/AddCustomer",            
+            data: {
+                username: username,
+                password: password,
+                name: name,
+                email: email,
+                tel: tel,
+                address: address
+            },
+            dataType: 'json',
+            success: function () {}           
+        });
+        location.reload();
+    });
+
+    $("#updateCustomer").click(function () {
+        var customerID = $("#txtHiddenCustomerValue").val();
+        $.ajax({
+            url: "/Customer/EditCustomer",
+            type: "POST",
+            data: {
+                customerID: customerID,
+                name: $("#txteditName").val(),
+                email: $("#txteditEmail").val(),
+                tel: $("#txteditTel").val(),
+                address: $("#txteditAddress").val()
+            },
+            dataType: 'json',
+            success: function () {}         
+        });
+        location.reload();
+       
+    });
+
+    $(document).on("click", "#tblCustomer button.btnEditCustomer", function () {
+
+        $("#txtHiddenCustomerValue").val($(this).val());
+        let tr = $(this).closest('tr');
+        $("#txteditName").val(tr.find('td[name="Name"]').text());
+        $("#txteditEmail").val(tr.find('td[name="Email"]').text());
+        $("#txteditTel").val(tr.find('td[name="Tel"]').text());
+        $("#txteditAddress").val(tr.find('td[name="Address"]').text());       
+    });
+
+    $(document).on("click", "#tblCustomer button.btnDeleteCustomer", function () {
+        let customerID = $(this).val();
+        $.ajax({
+            url: "/Customer/DeleteCustomer",
+            type: "POST",
+            data: {
+                customerID: customerID
+            },
+            dataType: 'json',
+            success: function () {
+                location.reload();
+            }           
+        });
+
+    });
+</script>

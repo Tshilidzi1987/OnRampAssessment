@@ -1,0 +1,267 @@
+﻿
+@{
+    ViewBag.Title = "Category";
+}
+
+<style>
+    body {
+        font-size: 12px;
+    }
+
+    .pagination {
+        margin: 8px 0px 2px 0px;
+    }
+
+    .form-control {
+        height: 30px;
+        padding: 0px 0px 0px 0px;
+        font-size: 13px;
+        line-height: 0;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8" style="text-align:center;">
+            <h3>Categories</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8" style="border-radius: 10px; padding: 5px 0px 15px 10px; margin: 0px 0px 13px 11px; border: solid; border-color: #ddd;">
+            <div class="row" style="margin-right: 0px; margin-left: 0px;">
+                <div class="col-lg-6">
+                    <h5>category name</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtCategoryName" />
+                    </div>
+                    <h5>Description</h5>
+                    <div>
+                        <input class="form-control" type="text" id="txtDescription" />
+                    </div>
+                    <div style=" padding: 9px 44px 0px 0px; float:right;">
+                        <button type="submit" id="btnAdd" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>               
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" style="border-radius: 10px; padding: 20px 18px 5px 15px; margin: 0px 0px 13px 11px; border: solid; border-color: #ddd; ">
+
+            <div class="row">
+                <div class="col-lg-6" style="padding: 0px 0px 5px 15px;">
+                    <label style=" padding:7px 0px 0px 0px; width:87px;" class="control-label col-sm-4">
+                        Rows per grid:
+                    </label>
+                    <div>
+                        <select style="width: 60px;" data-bind="value: pageSize,
+                        optionsCaption: 'All Results',
+                        options: pageSizes, event:{ change: ResetCurrentPage }" class="form-control">
+                        </select>
+                    </div>
+                </div>               
+            </div>
+            <!--Grid to display categories-->
+            <table id="tblCategory" class="table table-striped table-bordered table-sm" width="100%" cellspacing="0">
+                <thead style="background: #2C3E50; color:#ddd;">
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>                        
+                        <th width="20%"></th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach :PagedResults">
+                    <tr>
+                        <td name="Name" data-bind="text:CategoryName"></td>
+                        <td name="Description" data-bind="text:CategoryDescription"></td>                        
+                        <td>
+                            <button name="btnEditCategory" data-bind="value:ProductCategoryID" type="button" class="btn btn-primary btnEditCategory" data-toggle="modal" data-target="#editCategory">edit</button>
+                            <button name="btnDeleteCategory" data-bind="value:ProductCategoryID" type="button" class="btn btn-warning btnDeleteCategory">delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfooter>
+                    <tr>
+                        <td colspan="10" class="text-center">
+                            <ul data-bind="foreach: PageList" class="pagination">
+                                <li class="page-item">
+                                    <a href="#" class="page-link" data-bind="text: $data + 1, click: GoToPage, css: GetClass($data)"></a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tfooter>
+            </table>
+            <!--End Grid-->
+        </div>
+    </div>
+</div>
+<input type="hidden" id="txtHiddenCategoryValue" />
+<!-- Modal -->
+<div class="modal fade" id="editCategory" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Category</h4>
+                <button type="button" class="close" data-dismiss="modal" style="margin-top: -20px !important;" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div>
+                            <h5>Name</h5>
+                            <input class="form-control" style="max-width:400px;" type="text" id="txteditName" />
+                        </div>
+                        <div>
+                            <h5>Description</h5>
+                            <input class="form-control" style="max-width:400px;" type="text" id="txteditDescription" />
+                        </div>
+                    </div>                    
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateCategory">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end modal-->
+
+<script type="text/javascript">
+    function ViewModel() {
+        var vm = this;
+
+        vm.categoriesCollection = ko.observableArray();
+
+        vm.pageSizes = [5, 10, 20];
+        vm.pageSize = ko.observable(pageSizes[0]);
+        vm.currentPage = ko.observable(0);
+
+        // returns number of pages required for number of results selected
+        vm.PageCount = ko.computed(function () {
+            if (vm.pageSize()) {
+                return Math.ceil(vm.categoriesCollection().length / vm.pageSize());
+            } else {
+                return 1;
+            }
+        });
+
+        // returns items from the array for the current page
+        vm.PagedResults = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return vm.categoriesCollection().slice(vm.currentPage() * vm.pageSize(), (vm.currentPage() * vm.pageSize()) + vm.pageSize());
+            } else {
+                return vm.categoriesCollection();
+            }
+        });
+
+        // returns a list of numbers for all pages
+        vm.PageList = ko.computed(function () {
+            if (vm.PageCount() > 1) {
+                return Array.apply(null, {
+                    length: vm.PageCount()
+                }).map(Number.call, Number);
+            }
+        });
+
+        // reset to first page
+        vm.ResetCurrentPage = function () {
+            vm.currentPage(0);
+        }
+        // go to page number
+        vm.GoToPage = function (page) {
+            vm.currentPage(page);
+        }
+        // determines if page # is active returns active class
+        vm.GetClass = function (page) {
+            return (page == vm.currentPage()) ? "active" : "";
+        }
+        // populate list of products
+        vm.GetCategories = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Category/GetCategory",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != "") {
+                        vm.categoriesCollection(response);
+                    }
+                }
+            });
+        }
+        vm.GetCategories();
+    }
+    ko.applyBindings(ViewModel);
+
+    $("#btnExport").click(function () {
+
+        $("#tblCategory").table2excel({
+            exclude: ".noExport",
+            name: "Data",
+            filename: "Workbook",
+            sheetName: "customers"
+        });
+
+    });
+    $("#btnAdd").click(function () {
+
+        $.ajax({
+            url: "/Category/AddCategory",
+            type: "POST",
+            data: {
+                name: $("#txtCategoryName").val(),
+                description: $("#txtDescription").val()              
+            },
+            dataType: 'json',
+            success: function () {}
+        });
+        location.reload();
+    });
+
+    $("#updateCategory").click(function () {
+        var categoryID = $("#txtHiddenCategoryValue").val();
+        $.ajax({
+            url: "/Category/EditCategory",
+            type: "POST",
+            data: {
+                categoryID: categoryID,
+                name: $("#txteditName").val(),
+                description: $("#txteditDescription").val()              
+            },
+            dataType: 'json',
+            success: function () {}
+        });
+        location.reload();
+    });
+
+    $(document).on("click", "#tblCategory button.btnEditCategory", function () {
+
+        $("#txtHiddenCategoryValue").val($(this).val());
+        let tr = $(this).closest('tr');
+        $("#txteditName").val(tr.find('td[name="Name"]').text());
+        $("#txteditDescription").val(tr.find('td[name="Description"]').text());      
+    });
+
+    $(document).on("click", "#tblCategory button.btnDeleteCategory", function () {
+        let categoryID = $(this).val();
+        $.ajax({
+            url: "/Category/DeleteCategory",
+            type: "POST",
+            data: {
+                categoryID: categoryID
+            },
+            dataType: 'json',
+            success: function () {}
+        });
+        location.reload();
+    });
+</script>
+
+
